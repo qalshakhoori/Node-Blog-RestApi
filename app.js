@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 
 const feedRoutes = require('./routes/feed');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -30,7 +31,7 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const MONGODB_URI = 'mongodb://dbuser:Password1234@127.0.0.1:27017/blog';
+const MONGODB_URI = 'mongodb://nodejs:Password1234@127.0.0.1:27017/blog';
 
 app.use(bodyParser.json()); // application-json
 
@@ -42,22 +43,26 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+  );
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 
 app.use('/feed', feedRoutes);
+app.use('/auth', authRoutes);
 
 app.use((error, req, res, next) => {
-  console.log(error);
-  const status = error.statusCode;
+  const status = error.statusCode || 500;
   const message = error.message;
-  res.status(status).json({ message: message });
+  const data = error.data;
+  res.status(status).json({ message: message, data: data });
 });
 
 mongoose
-  .connect(MONGODB_URI)
+  .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => {
     app.listen(8080);
   })
