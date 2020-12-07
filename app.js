@@ -31,14 +31,11 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const MONGODB_URI = 'mongodb://nodejs:Password1234@127.0.0.1:27017/blog';
-
-app.use(bodyParser.json()); // application-json
-
+// app.use(bodyParser.urlencoded()); // x-www-form-urlencoded <form>
+app.use(bodyParser.json()); // application/json
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
 );
-
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use((req, res, next) => {
@@ -55,15 +52,22 @@ app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes);
 
 app.use((error, req, res, next) => {
+  console.log(error);
   const status = error.statusCode || 500;
   const message = error.message;
   const data = error.data;
   res.status(status).json({ message: message, data: data });
 });
 
+const MONGODB_URI = 'mongodb://nodejs:Password1234@127.0.0.1:27017/blog';
+
 mongoose
   .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => {
-    app.listen(8080);
+    const server = app.listen(8080);
+    const io = require('./socket').init(server);
+    io.on('connection', (socket) => {
+      console.log('Client Connected');
+    });
   })
   .catch((err) => console.log(err));
