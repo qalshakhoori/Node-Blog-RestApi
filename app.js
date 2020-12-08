@@ -65,7 +65,12 @@ mongoose
   .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => {
     const server = app.listen(8080);
-    const io = require('./socket').init(server);
+    const io = require('./socket').init(server, {
+      cors: {
+        origin: 'http://localhost:3001/',
+        methods: ['GET', 'POST'],
+      },
+    });
     io.on('connection', (socket) => {
       console.log('Client connected');
     });
