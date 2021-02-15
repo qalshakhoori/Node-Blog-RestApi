@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
 
+const { MONGODB_URI } = require('./utils/consts');
 const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
 
@@ -59,7 +60,7 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
-const MONGODB_URI = 'mongodb://nodejs:Password1234@127.0.0.1:27017/blog';
+// const MONGODB_URI = 'mongodb://nodejs:Password1234@127.0.0.1:27017/blog';
 
 mongoose
   .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })

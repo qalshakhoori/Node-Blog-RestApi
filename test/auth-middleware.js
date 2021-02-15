@@ -38,7 +38,7 @@ describe('auth middleware', () => {
     expect(authMiddleware.bind(this, req, {}, () => {})).to.throw();
   });
 
-  it('should throw an error if the token cannot be verified', () => {
+  it('should yield a user if after decoding the token', () => {
     const req = {
       get: function (headerName) {
         return 'Bearer abd';
