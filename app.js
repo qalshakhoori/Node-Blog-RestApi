@@ -8,6 +8,7 @@ const multer = require('multer');
 const { MONGODB_URI } = require('./utils/consts');
 const feedRoutes = require('./routes/feed');
 const authRoutes = require('./routes/auth');
+const { configureSockerIO } = require('./utils/helpers');
 
 const app = express();
 
@@ -66,12 +67,7 @@ mongoose
   .connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then((result) => {
     const server = app.listen(8080);
-    const io = require('./socket').init(server, {
-      cors: {
-        origin: 'http://localhost:3001/',
-        methods: ['GET', 'POST'],
-      },
-    });
+    const io = configureSockerIO(server);
     io.on('connection', (socket) => {
       console.log('Client connected');
     });
